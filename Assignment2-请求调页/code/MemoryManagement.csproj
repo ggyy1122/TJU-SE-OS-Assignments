@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+
+    <!-- Release 优化配置 -->
+    <Optimize>true</Optimize>                      <!-- 启用代码优化 -->
+    <DebugType>none</DebugType>                    <!-- 不生成 PDB 调试文件 -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile> <!-- 关闭 XML 文档 -->
+
+    <!-- 单文件发布配置 -->
+    <PublishSingleFile>true</PublishSingleFile>    <!-- 生成单个 EXE -->
+    <SelfContained>false</SelfContained>          <!-- 不包含 .NET 运行时（依赖系统安装的运行时） -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier> <!-- 目标平台（可选 win-x86） -->
+
+    <!-- 完全禁用剪裁（避免 WPF 兼容性问题） -->
+    <PublishTrimmed>false</PublishTrimmed>         <!-- 关键修改：禁用剪裁 -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <!-- 移除了 TrimmableAssembly 配置（因为已禁用剪裁） -->
+
+</Project>

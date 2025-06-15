@@ -1,0 +1,152 @@
+﻿<Window x:Class="MemoryManagement.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="内存管理模拟" Height="700" Width="1100" MinWidth="700" MinHeight="500">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" MinWidth="200"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="250" MinWidth="250"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 左侧参数设置区域 -->
+        <Border Grid.Column="0" BorderBrush="LightGray" BorderThickness="0,0,1,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="10">
+                    <TextBlock Text="内存管理参数" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                    <TextBlock Text="每页存放指令数：" Margin="5,5,5,0"/>
+                    <TextBox x:Name="PageSizeBox" Margin="5" Text="10"/>
+
+                    <TextBlock Text="作业占用内存页数：" Margin="5,10,5,0"/>
+                    <TextBox x:Name="TaskFrameCountBox" Margin="5" Text="32"/>
+
+                    <TextBlock Text="可用内存页数：" Margin="5,10,5,0"/>
+                    <TextBox x:Name="MemoryFrameCountBox" Margin="5" Text="4"/>
+                    <TextBlock Text="下一指令：" Margin="5,10,5,0"/>
+                    <TextBox x:Name="CurrentInstructionBox" Margin="5" Text="0"/>
+                    <TextBlock Text="缺页数：" Margin="5,10,5,0"/>
+                    <TextBox x:Name="PageFaultCountBox" Margin="5" Text="0" IsReadOnly="True"/>
+
+                    <TextBlock Text="缺页率：" Margin="5,10,5,0"/>
+                    <TextBox x:Name="PageFaultRateBox" Margin="5" Text="0%" IsReadOnly="True"/>
+
+                    <TextBlock Text="替换策略：" Margin="5,10,5,0"/>
+                    <ComboBox x:Name="ReplacerComboBox" Margin="5" SelectedIndex="0">
+                        <ComboBoxItem Content="FIFO"/>
+                        <ComboBoxItem Content="LRU"/>
+                    </ComboBox>
+
+           
+                    <TextBlock Text="执行顺序：" Margin="5,10,5,0"/>
+                    <ComboBox x:Name="ExecutionOrderComboBox" Margin="5" SelectedIndex="0">
+                        <ComboBoxItem Content="随机执行"/>
+                        <ComboBoxItem Content="顺序执行"/>
+                    </ComboBox>
+                   
+                    <Button Content="应用参数" Margin="5,20,5,0" Padding="10,5" 
+                    HorizontalAlignment="Stretch" Click="ReadParameters_Click"/>
+                    <Button Content="单步执行" Margin="5,10,5,0" Padding="10,5" 
+                    HorizontalAlignment="Stretch" Click="StepExecute_Click"/>
+                    <Button x:Name="AutoRunBtn" Content="连续执行" 
+        Margin="5,10,5,0" Padding="10,5"
+        Click="AutoRun_Click"/>
+                    <Button Content="重置参数" Margin="5,10,5,0" Padding="10,5" 
+                    HorizontalAlignment="Stretch" Click="ResetParameters_Click"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 中间内存页展示区域 -->
+        <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="0,0,1,0" Padding="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="内存页状态" FontWeight="Bold" Margin="0,0,0,10" FontSize="16"/>
+
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <UniformGrid x:Name="MemoryFramePanel" Columns="4" />
+                    <!-- 自动均匀填充，列数可调，框会均分宽度 -->
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+
+
+        <!-- 右侧日志/信息区域 -->
+        <Border Grid.Column="2" BorderThickness="0,0,0,0" Padding="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 标题 -->
+                <TextBlock Text="执行日志" FontWeight="Bold" Margin="10,10,10,6" HorizontalAlignment="Center"/>
+
+                <!-- 日志表格 - 均分列宽 -->
+                <ListView x:Name="LogListView"
+                  Grid.Row="1"
+                  Margin="0"
+                  Padding="0"
+                  BorderThickness="1"
+                  BorderBrush="LightGray"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  SizeChanged="LogListView_SizeChanged">
+                    <ListView.View>
+                        <GridView x:Name="LogGridView">
+                            <GridViewColumn Header="序号">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Index}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="地址">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Address}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="缺页">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding PageFault}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="换出页">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding SwappedOut}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="换入页">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding SwappedIn}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+                <!-- 清空按钮 -->
+                <Button Content="清空日志"
+                Grid.Row="2"
+                Margin="10"
+                Padding="10,5"
+                HorizontalAlignment="Stretch"
+                Click="ClearLog_Click"/>
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>
